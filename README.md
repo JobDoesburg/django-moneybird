@@ -20,6 +20,8 @@ MONEYBIRD_WEBHOOK_EVENTS = [
 ]
 MONEYBIRD_WEBHOOK_ID = os.environ.get("MONEYBIRD_WEBHOOK_ID")
 MONEYBIRD_WEBHOOK_TOKEN = os.environ.get("MONEYBIRD_WEBHOOK_TOKEN")
+MONEYBIRD_WEBHOOK_SITE_DOMAIN = os.environ.get("MONEYBIRD_WEBHOOK_SITE_DOMAIN") # e.g. "https://example.com"
+MONEYBIRD_WEBHOOK_ALLOW_INSECURE = False # Set to False for testing purposes only
 
 MONEYBIRD_AUTO_PUSH = True # Push changes to Moneybird automatically (so you don't have to call `instance.push_to_moneybird()` manually)
 MONEYBIRD_FETCH_BEFORE_PUSH = False # Fetch the latest data from Moneybird before pushing changes. This is useful if you want to avoid overwriting changes made in Moneybird, but it will slow down your application. With webhooks, this is likely not necessary.
@@ -86,3 +88,15 @@ class ContactResourceType(ContactResourceType):
 ```
 
 For document lines, your model should extend `MoneybirdDocumentLineModel`.
+
+
+### Webhooks
+If you want to use webhooks, you should add the following to your `urls.py`:
+
+```python
+    path("moneybird/", include("moneybird.webhooks.urls")),
+```
+
+### Syncing
+
+To sync all resources, you can use the `sync_moneybird` management command or call `synchronization.synchronize()`.
