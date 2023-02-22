@@ -103,5 +103,11 @@ urlpatterns = [
 ]
 ```
 
+After that, use the `listmoneybirdwebhook`, `registermoneybirdwebhook` and `deletemoneybirdwebhook` management commands to manage your webhooks. 
+
+### Admin
+In order to properly display the Moneybird resources in the admin, your admin should extend from `MoneybirdResourceModelAdminMixin` or inherit from the `MoneybirdResourceModelAdmin` class.
+
+
 ### Syncing
 To sync all resources, you can use the `moneybirdsync` management command or call `moneybird.synchronization.synchronize()`.
