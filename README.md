@@ -5,66 +5,32 @@
 Put the following settings in your `settings.py` file:
 
 ```python
+import os
+from moneybird.webhooks import WebhookEvent
+
 MONEYBIRD_ADMINISTRATION_ID = int(os.environ.get("MONEYBIRD_ADMINISTRATION_ID", 0))
 MONEYBIRD_API_KEY = os.environ.get("MONEYBIRD_API_KEY")
 MONEYBIRD_RESOURCE_TYPES = [
-    "accounting.models.document_style.DocumentStyleResourceType",
-    "accounting.models.tax_rate.TaxRateResourceType",
-    "accounting.models.workflow.WorkflowResourceType",
-    "accounting.models.ledger_account.LedgerAccountResourceType",
-    "accounting.models.product.ProductResourceType",
-    "accounting.models.project.ProjectResourceType",
-    "accounting.models.contact.ContactResourceType",
-    "accounting.models.recurring_sales_invoice.RecurringSalesInvoiceResourceType",
-    "accounting.models.estimate.EstimateResourceType",
-    "accounting.models.sales_invoice.SalesInvoiceResourceType",
-    "accounting.models.purchase_document.PurchaseInvoiceDocumentResourceType",
-    "accounting.models.purchase_document.ReceiptResourceType",
-    "accounting.models.general_journal_document.GeneralJournalDocumentResourceType",
-    "accounting.models.subscription.SubscriptionResourceType",
+    "myapp.moneybird_resources.ContactResourceType",
 ]
+
+# If you want to receive webhook events, you should define the following:
 MONEYBIRD_WEBHOOK_EVENTS = [
     WebhookEvent.CONTACT,
-    WebhookEvent.SALES_INVOICE,
-    WebhookEvent.DOCUMENT,
-    WebhookEvent.ESTIMATE,
-    WebhookEvent.RECURRING_SALES_INVOICE,
-    WebhookEvent.SUBSCRIPTION_CANCELLED,
-    WebhookEvent.SUBSCRIPTION_CREATED,
-    WebhookEvent.SUBSCRIPTION_UPDATED,
-    WebhookEvent.SUBSCRIPTION_EDITED,
-    WebhookEvent.SUBSCRIPTION_DESTROYED,
-    WebhookEvent.TAX_RATE_UPDATED,
-    WebhookEvent.TAX_RATE_CREATED,
-    WebhookEvent.TAX_RATE_DEACTIVATED,
-    WebhookEvent.TAX_RATE_DESTROYED,
-    WebhookEvent.TAX_RATE_ACTIVATED,
-    WebhookEvent.WORKFLOW,
-    WebhookEvent.LEDGER_ACCOUNT,
-    WebhookEvent.PRODUCT_UPDATED,
-    WebhookEvent.PRODUCT_CREATED,
-    WebhookEvent.PRODUCT_DEACTIVATED,
-    WebhookEvent.PRODUCT_DESTROYED,
-    WebhookEvent.PRODUCT_ACTIVATED,
-    WebhookEvent.PROJECT_UPDATED,
-    WebhookEvent.PROJECT_CREATED,
-    WebhookEvent.PROJECT_ARCHIVED,
-    WebhookEvent.PROJECT_DESTROYED,
-    WebhookEvent.PROJECT_ACTIVATED,
-    WebhookEvent.DOCUMENT_STYLE_CREATED,
-    WebhookEvent.DOCUMENT_STYLE_UPDATED,
-    WebhookEvent.DOCUMENT_STYLE_DESTROYED,
 ]
 MONEYBIRD_WEBHOOK_ID = os.environ.get("MONEYBIRD_WEBHOOK_ID")
 MONEYBIRD_WEBHOOK_TOKEN = os.environ.get("MONEYBIRD_WEBHOOK_TOKEN")
 
-MONEYBIRD_AUTO_PUSH = True
-MONEYBIRD_FETCH_BEFORE_PUSH = False
+MONEYBIRD_AUTO_PUSH = True # Push changes to Moneybird automatically (so you don't have to call `instance.push_to_moneybird()` manually)
+MONEYBIRD_FETCH_BEFORE_PUSH = False # Fetch the latest data from Moneybird before pushing changes. This is useful if you want to avoid overwriting changes made in Moneybird, but it will slow down your application. With webhooks, this is likely not necessary.
 ```
 
 Your models should inherit from `SynchronizableMoneybirdResourceModel` (if they have a synchronization endpoint, see developer.moneybird.com) or `MoneybirdResourceModel`:
 
 ```python
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
 from moneybird.models import SynchronizableMoneybirdResourceModel
 
 class Contact(SynchronizableMoneybirdResourceModel):
@@ -93,6 +59,8 @@ Finally, define a `MoneybirdResourceType` for each model, like this:
 
 ```python
 from moneybird.resources import ContactResourceType
+
+from myapp.models import Contact
 
 class ContactResourceType(ContactResourceType):
     model = Contact
