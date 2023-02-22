@@ -6,7 +6,7 @@ Put the following settings in your `settings.py` file:
 
 ```python
 import os
-from moneybird.webhooks import WebhookEvent
+from moneybird.webhooks.events import WebhookEvent
 
 MONEYBIRD_ADMINISTRATION_ID = int(os.environ.get("MONEYBIRD_ADMINISTRATION_ID", 0))
 MONEYBIRD_API_KEY = os.environ.get("MONEYBIRD_API_KEY")
@@ -94,9 +94,14 @@ For document lines, your model should extend `MoneybirdDocumentLineModel`.
 If you want to use webhooks, you should add the following to your `urls.py`:
 
 ```python
+from django.urls import include, path
+
+urlpatterns = [
+    ...,
     path("moneybird/", include("moneybird.webhooks.urls")),
+    ...
+]
 ```
 
 ### Syncing
-
-To sync all resources, you can use the `sync_moneybird` management command or call `synchronization.synchronize()`.
+To sync all resources, you can use the `moneybirdsync` management command or call `moneybird.synchronization.synchronize()`.
